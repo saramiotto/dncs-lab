@@ -245,7 +245,7 @@ To see if the results of our work were correct, we had to test it.
 We have started by using the command `vagrant up` and the we've connected to Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We have done it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending of which host we've chosen to use. In the end, we've used the command `curl 10.0.4.2` to make the request. That is the following output that we have recived:
 
 ## Team members
-This project has been realised by Miotto Sara (matriculation number: 202440) and Calore Chiara (matriculation number: 202404 - team leader)
+This project has been realised by Miotto Sara (matriculation number: 202440) and Calore Chiara (matriculation number: 202404)
 
 
 
