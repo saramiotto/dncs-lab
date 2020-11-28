@@ -152,7 +152,7 @@ Then, we have proceded to create two VLANs: one is mentioned for subnet-2,and ha
 The commands that we have used to run the creation of the VMs are included in the shell script under the name of "vagrant up".
 The reason why we have decided to use this range of addresses was to accomplish the requirement that stated that we had to remain as much generic as possible.
 We have also modified the Vagrantfile, in order to insert the specific path for every device that we had.
-To conclude, we have enlarged Host-C's memory, from 256 MB to 1024 MB. That choice was made because that specific host runs the Docker image. Otherwise, we wouldn't have been able to pull and run the Docker image itself.
+To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB. That choice was made because that specific host runs the Docker image. Otherwise, we wouldn't have been able to pull and run the Docker image itself.
 
     
     config.vm.define "host-c" do |hostc|
@@ -161,7 +161,7 @@ To conclude, we have enlarged Host-C's memory, from 256 MB to 1024 MB. That choi
     hostc.vm.network "private_network", virtualbox__intnet: "broadcast_router-south-2", auto_config: false
     hostc.vm.provision "shell", path: "host-c.sh"
     hostc.vm.provider "virtualbox" do |vb|
-    vb.memory = 1024
+    vb.memory = 512
     end  
     
 ## Devices Configuration
