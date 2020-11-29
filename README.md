@@ -243,7 +243,7 @@ Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`.
 
 ## Test results
 To see if the results of our work were correct, we had to test it. 
-We have started by using the command `vagrant up` and the we've connected to Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We have done it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending of which host we've chosen to use. In the end, we've used the command `curl 192.168.4.2` to make the request. As a result, we have obtained the following output :
+We've started by using the command `vagrant up` and the we've logged into Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We have done it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending on which host we've chosen to use. In the end, we've used the command `curl 192.168.4.2` to make the request. As a result, we have obtained the following output :
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Final_results.jpg)
   
     
