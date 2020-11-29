@@ -147,7 +147,7 @@ Then, we have proceded to create two VLANs: one is mentioned for subnet-2,and ha
 | Router-2          | 192.168.4.1       | enp0s8              |   4          |
 | Host-C            | 192.168.4.2       | enp0s8              |   4          |
 ## Network Schema 
-![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Network%20(1).jpeg?raw=true)
+![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Network%20_schema.jpg)
 ## Vagrant file
 The commands that we have used to run the creation of the VMs are included in the shell script under the name of "vagrant up".
 The reason why we have decided to use this range of addresses was to accomplish the requirement that stated that we had to remain as much generic as possible.
