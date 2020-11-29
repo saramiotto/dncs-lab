@@ -131,21 +131,21 @@ In order to design the network as it was requested, we had to follow some other 
 ## Subnetting
 We have chosen to split up our network into four subnetworks: 
 - for the first one, which is between Router-1 and Router-2, we have decided to use the subnet 10.1.1.0/30 so that we were able to cover only the two routers that we had taken into account ((2^2)-2=2);
-- for the second one, which is between Router-1 and Host-A, we have figured out that we had to use the subnet 10.0.0.0/23 in order to cover the number of the provided hosts, (2^9=510>376);
-- for the third one, which is between Router-1 and Host-B, we have used the subnet 10.0.2.0/23. In this way, we have covered the 479 addresses (2^9=510>479).
-- for the last one, which is between Router-2 and Host-C, we have used the subnet 10.0.4.0/23 and so we had succeeded to cover the 493 addresses (2^9=510>493).
+- for the second one, which is between Router-1 and Host-A, we have figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, (2^9=510>376);
+- for the third one, which is between Router-1 and Host-B, we have used the subnet 192.168.2.0/23. In this way, we have covered the 479 addresses (2^9=510>479).
+- for the last one, which is between Router-2 and Host-C, we have used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses (2^9=510>493).
 ## Ip configuration and VLAN
 Then, we have proceded to create two VLANs: one is mentioned for subnet-2,and has the Tag "2". The other one is for subnet-3 and has Tag "3". The choice of creating two VLANs was made in order to distinguish Host-A's network and Host-B's network.
-| Device name       | Ip Address     | Network Interface   |  Subnet      |
-| -------------     | -------------  | -------------       |------------- |
-| Router-1          | 10.1.1.1       | enp0s9              |   1          |         
-| Router-2          | 10.1.1.2       | enp0s9              |   1          |
-| Router-1          | 10.0.0.1       | enp0s8.2            |   2          |
-| Host-A            | 10.0.0.2       | enp0s8              |   2          |
-| Router-1          | 10.0.2.1       | enp0s8.3            |   3          |
-| Host-B            | 10.0.2.2       | enp0s8              |   3          |
-| Router-2          | 10.0.4.1       | enp0s8              |   4          |
-| Host-C            | 10.0.4.2       | enp0s8              |   4          |
+| Device name       | Ip Address        | Network Interface   |  Subnet      |
+| -------------     | -------------     | -------------       |------------- |
+| Router-1          | 10.1.1.1          | enp0s9              |   1          |         
+| Router-2          | 10.1.1.2          | enp0s9              |   1          |
+| Router-1          | 192.168.0.1       | enp0s8.2            |   2          |
+| Host-A            | 192.168.0.2       | enp0s8              |   2          |
+| Router-1          | 192.168.2.1       | enp0s8.3            |   3          |
+| Host-B            | 192.168.2.2       | enp0s8              |   3          |
+| Router-2          | 192.168.4.1       | enp0s8              |   4          |
+| Host-C            | 192.168.4.2       | enp0s8              |   4          |
 ## Network Schema 
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Network%20(1).jpeg?raw=true)
 ## Vagrant file
@@ -182,17 +182,18 @@ For our Switch, we have already found the first four lines in the `switch.sh` pr
     sudo ip link set dev enp0s10 up
 
 ## Router-1
-For our first Router, we have enabled the Kernel option for IP forwarding with cìthe command `sudo sysctl -w net.ipv4.ip_forward=1`. Then, with the command `sudo sysctl addr add` we have added the IP address to the interface and started also the network interfaces. With `sudo ip link add link` we have added a virtual link and then add the correct address. To conclude, we have added with the command `sudo ip route add` the route via the designated gateway to the correct address.
+For our first Router, we have enabled the Kernel option for IP forwarding with the command `sudo sysctl -w net.ipv4.ip_forward=1`. Then, with the command `sudo sysctl addr add` we have added the IP address to the interface and started also the network interfaces. With `sudo ip link add link` we have added a virtual link and then add the correct address. To conclude, we have added with the command `sudo ip route add` the route via the designated gateway to the correct address.
   
     export DEBIAN_FRONTEND=noninteractive
     sudo sysctl -w net.ipv4.ip_forward=1
     sudo ip addr add 10.1.1.1/30 dev enp0s9
     sudo ip link set dev enp0s9 up
-    sudo ip link set dev enp0s8 up
     sudo ip link add link enp0s8 name enp0s8.2 type vlan id 2
-    sudo ip addr add 10.0.0.1/23 dev enp0s8.2
     sudo ip link add link enp0s8 name enp0s8.3 type vlan id 3
-    sudo ip route add 10.0.4.0/23 via 10.1.1.2
+    sudo ip addr add 192.168.0.1/23 dev enp0s8.2
+    sudo ip addr add 192.168.2.1/23 dev enp0s8.3
+    sudo ip link set dev enp0s8 up
+    sudo ip route add 192.168.4.0/23 via 10.1.1.2
 
 ## Router-2
 As for Router-1, in our Router-2 we have done the same exact procedures showed above. Moreover, we have added the addresses to the designated devices. With the command `sudo ip route add` we have added the two routes via the designated gateway to the correct address.
@@ -201,28 +202,28 @@ As for Router-1, in our Router-2 we have done the same exact procedures showed a
     sudo sysctl -w net.ipv4.ip_forward=1
     sudo ip addr add 10.1.1.2/30 dev enp0s9
     sudo ip link set dev enp0s9 up
-    sudo ip addr add 10.0.4.1/23 dev enp0s8
+    sudo ip addr add 192.168.4.1/23 dev enp0s8
     sudo ip link set dev enp0s8 up
-    sudo ip route add 10.0.4.0/23 via 10.1.1.2
-    sudo ip route add 10.0.0.0/23 via 10.1.1.1
+    sudo ip route add 192.168.4.0/23 via 10.1.1.2
+    sudo ip route add 192.168.0.0/21 via 10.1.1.1
 
 ### Host-A
 For Host-A, we have configured the interface with its IP address, started the network interface by adding the command `sudo ip link set dev enp0s8 up`, then we connected, with the command `sudo ip route add` the new route's subnet to the designated device
   
     export DEBIAN_FRONTEND=noninteractive
-    sudo ip addr add 10.0.0.2/23 dev enp0s8
+    sudo ip addr add 192.168.0.2/23 dev enp0s8
     sudo ip link set dev enp0s8 up
-    sudo ip route add 10.1.1.0/30 via 10.0.0.1
-    sudo ip route add 10.0.0.0/23 via 10.0.0.1
+    sudo ip route add 10.1.1.0/30 via 192.168.0.1
+    sudo ip route add 192.168.0.0/21 via 192.168.0.1
 
 ### Host-B
 As for Host-A, in Host-B we have configured the interface with its IP address, started the network interface by adding the command `sudo ip link set dev enp0s8 up`, then we connected, with the command `sudo ip route add` the new route's subnet to the designated device
     
     export DEBIAN_FRONTEND=noninteractive
-    sudo ip addr add 10.0.2.2/23 dev enp0s8
+    sudo ip addr add 192.168.2.2/23 dev enp0s8
     sudo ip link set dev enp0s8 up
-    sudo ip route add 10.1.1.0/30 via 10.0.2.1
-    sudo ip route add 10.0.0.0/23 via 10.0.2.1
+    sudo ip route add 10.1.1.0/30 via 192.168.2.1
+    sudo ip route add 192.168.0.0/21 via 192.168.2.1
 
 ### Host-C
 Instead, for Host-C, with the command `sudo apt-get update` we have downloaded the package information from all the configured sources.
@@ -235,14 +236,16 @@ Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`.
     sudo systemctl enable docker
     sudo docker pull dustnic82/nginx-test
     sudo docker run --name nginx -p 80:80 -d dustnic82/nginx-test
-    sudo ip addr add 10.0.4.2/23 dev enp0s8
+    sudo ip addr add 192.168.4.2/23 dev enp0s8
     sudo ip link set dev enp0s8 up
-    sudo ip route add 10.1.1.0/30 via 10.0.4.1
-    sudo ip route add 10.0.0.0/23 via 10.0.4.1
+    sudo ip route add 10.1.1.0/30 via 192.168.4.1
+    sudo ip route add 192.168.0.0/21 via 192.168.4.1
 
 ## Test results
 To see if the results of our work were correct, we had to test it. 
-We have started by using the command `vagrant up` and the we've connected to Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We have done it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending of which host we've chosen to use. In the end, we've used the command `curl 10.0.4.2` to make the request. That is the following output that we have recived:
+We have started by using the command `vagrant up` and the we've connected to Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We have done it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending of which host we've chosen to use. In the end, we've used the command `curl 192.168.4.2` to make the request. As a result, we have obtained the following :
+    
+    
 
 ## Team members
 This project has been realised by Miotto Sara (matriculation number: 202440) and Calore Chiara (matriculation number: 202404)
