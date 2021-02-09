@@ -177,7 +177,7 @@ So here it is a brief summery of the commands used. In the following paragraphs 
 ## Devices Configuration
 Then we started to configure each device that was previously mentioned.
 
-### Switch
+## Switch
 Speaking of our Switch, we had already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. Then we added, with the command `add-br`, a bridge and configured the different ports that we would have needed. In the end, we used the command `sudo ip link set dev` to start the network interfaces. 
   
     export DEBIAN_FRONTEND=noninteractive
