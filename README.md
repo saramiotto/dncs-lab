@@ -163,14 +163,14 @@ To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB modifying h
     vb.memory = 512
     end  
 
-##Command used
+## Commands used
 Before starting configuring our network we needed to check the correspondency between the interfaces names and the specifications given in the assignment so we used the command dsmeg | grep -i eth to do that. All the other commands are preceded by the keyword 'sudo' to make them execute by the superuser.
 So here it is a brief summery of the commands used. In the following paragraphs we will go deeply into them:
-ip addr add [ip_address] dev [interface]: assignes an IP address to each interface;
-ip link set dev [interface] up: activates the interface;
-ip link add link [original_interface] name [VLAN] type vlan id [tag]: creates a VLAN named [VLAN] from the interface [original_interface] and that add the tag [tag] to the traffic passing through that VLAN;
-sysctl -w net.ipv4.ip_forward=1: enables the IPv4 forwarding in the two routers;
-ip route add [addresses_covered] via [address] dev [interface]: creates a route that takes all the traffic to the addresses included in the network [addresses_covered] and direct it to the [address] passing from the [interface];
+* ip addr add [ip_address] dev [interface]: assignes an IP address to each interface;
+* ip link set dev [interface] up: activates the interface;
+* ip link add link [original_interface] name [VLAN] type vlan id [tag]: creates a VLAN named [VLAN] from the interface [original_interface] and that add the tag [tag] to the traffic passing through that VLAN;
+* sysctl -w net.ipv4.ip_forward=1: enables the IPv4 forwarding in the two routers;
+* ip route add [addresses_covered] via [address] dev [interface]: creates a route that takes all the traffic to the addresses included in the network [addresses_covered] and direct it to the [address] passing from the [interface];
 ## Devices Configuration
 Then we started to configure each device that was previously mentioned.
 ### Switch
