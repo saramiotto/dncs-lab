@@ -118,24 +118,23 @@ The assignment deliverable consists of a Github repository containing:
 
 
 # Design
-
 The three values that we have found by running the dncs-init script are:
 - 376 for Host-A;
 - 479 for Host-B;
 - 470 for Host-C.
 These represent the numbers of the scalable hosts in the subnets. 
 In order to design the network as it was requested, we had to follow some other rules:
-- Host-C had to run a docker image (dustnic82/nginx-test) which implements a web server that must be reachable from Host-A and Host_B;
-- No dynamic routing could be used;
+- Host-C had to run a docker image (dustnic82/nginx-test) which implements a web server that had to be reachable from Host-A and Host_B;
+- No dynamic routing could have been used;
 - Routes had to be has generic as possible.
 ## Subnetting
-We have chosen to split up our network into four subnetworks: 
+We have chosen to split up our network into four subnets: 
 - for the first one, which is between Router-1 and Router-2, we have decided to use the subnet 10.1.1.0/30 so that we were able to cover only the two routers that we had taken into account ((2^2)-2=2);
-- for the second one, which is between Router-1 and Host-A, we have figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, (2^9=510>376);
-- for the third one, which is between Router-1 and Host-B, we have used the subnet 192.168.2.0/23. In this way, we have covered the 479 addresses (2^9=510>479).
-- for the last one, which is between Router-2 and Host-C, we have used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses (2^9=510>493).
+- for the second one, which is between Router-1 and Host-A, we have figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, ((2^9)-2)=510>376). Infatc with 9 bits we obtain 2^9 - 2 = 510 usable addresses (one of them for the gateway).
+- for the third one, which is between Router-1 and Host-B, we have used the subnet 192.168.2.0/23. In this way, we have covered the 479 addresses ((2^9)-2)=510>479).
+- for the last one, which is between Router-2 and Host-C, we have used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses ((2^9)-2)=510>493).
 ## Ip configuration and VLAN
-Then, we have proceded to create two VLANs: one is mentioned for subnet-2,and has the Tag "2". The other one is for subnet-3 and has Tag "3". The choice of creating two VLANs was made in order to distinguish Host-A's network and Host-B's network.
+Then, we have proceeded to create two VLANs: one meant for subnet-2,and with Tag "2". The other one for subnet-3 and with Tag "3". The choice of creating two VLANs was made in order to distinguish the network belonging to Host-A and the network of Host-B.
 | Device name       | Ip Address        | Network Interface   |  Subnet      |
 | -------------     | -------------     | -------------       |------------- |
 | Router-1          | 10.1.1.1          | enp0s9              |   1          |         
@@ -149,12 +148,12 @@ Then, we have proceded to create two VLANs: one is mentioned for subnet-2,and ha
 ## Network Schema 
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Network_Schema.jpeg)
 ## Vagrant file
-The commands that we have used to run the creation of the VMs are included in the shell script under the name of "vagrant up".
-The reason why we have decided to use this range of addresses was to accomplish the requirement that stated that we had to remain as much generic as possible.
+The commands that we have used to configure the network  are included in the shell script, one for each device implemented. They start running when the Virtual Machines are created by launching the "vagrant up" command.
+They are all included in the so-called "Vagrantfile".
+The reason why we have decided to use this range of addresses was to accomplish the requirement that stated that we had to create routes as much generic as possible.
 We have also modified the Vagrantfile, in order to insert the specific path for every device that we had.
-To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB. That choice was made because that specific host runs the Docker image. Otherwise, we wouldn't have been able to pull and run the Docker image itself.
+To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB modifying he option vb.memory. That choice was taken because that specific host runs the Docker image (dustnic82/nginx-test). With 256 MB of memory we wouldn't have been able to pull and run the Docker image itself.
 
-    
     config.vm.define "host-c" do |hostc|
     hostc.vm.box = "ubuntu/bionic64"
     hostc.vm.hostname = "host-c"
@@ -163,12 +162,19 @@ To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB. That choic
     hostc.vm.provider "virtualbox" do |vb|
     vb.memory = 512
     end  
-    
+
+##Command used
+Before starting configuring our network we needed to check the correspondency between the interfaces names and the specifications given in the assignment so we used the command dsmeg | grep -i eth to do that. All the other commands are preceded by the keyword 'sudo' to make them execute by the superuser.
+So here it is a brief summery of the commands used. In the following paragraphs we will go deeply into them:
+ip addr add [ip_address] dev [interface]: assignes an IP address to each interface;
+ip link set dev [interface] up: activates the interface;
+ip link add link [original_interface] name [VLAN] type vlan id [tag]: creates a VLAN named [VLAN] from the interface [original_interface] and that add the tag [tag] to the traffic passing through that VLAN;
+sysctl -w net.ipv4.ip_forward=1: enables the IPv4 forwarding in the two routers;
+ip route add [addresses_covered] via [address] dev [interface]: creates a route that takes all the traffic to the addresses included in the network [addresses_covered] and direct it to the [address] passing from the [interface];
 ## Devices Configuration
-We then started to configure each device that was previously mentioned.
+Then we started to configure each device that was previously mentioned.
 ### Switch
-For our Switch, we have already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. We then added, with the command `add-br`, a bridge and configured the different ports that we'll need. At the end, we used the command `sudo ip link set dev` to start the network interfaces. 
-  
+Speaking of our Switch, we had already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. Then we added, with the command `add-br`, a bridge and configured the different ports that we would have needed. In the end, we used the command `sudo ip link set dev` to start the network interfaces.   
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y tcpdump
@@ -182,7 +188,7 @@ For our Switch, we have already found the first four lines in the `switch.sh` pr
     sudo ip link set dev enp0s10 up
 
 ## Router-1
-For our first Router, we have enabled the Kernel option for IP forwarding with the command `sudo sysctl -w net.ipv4.ip_forward=1`. Then, with the command `sudo sysctl addr add` we have added the IP address to the interface and started also the network interfaces. With `sudo ip link add link` we have added a virtual link and then add the correct address. To conclude, we have added with the command `sudo ip route add` the route via the designated gateway to the correct address.
+For our first Router, we enabled the Kernel option for IP forwarding with the command `sudo sysctl -w net.ipv4.ip_forward=1`. Then, with the command `sudo sysctl addr add` we added the IP address to the interface and started also the network interfaces. With `sudo ip link add link` we added a virtual link and then the correct address. To conclude, we added with the command `sudo ip route add` the route via the designated gateway to the correct address.
   
     export DEBIAN_FRONTEND=noninteractive
     sudo sysctl -w net.ipv4.ip_forward=1
@@ -196,8 +202,8 @@ For our first Router, we have enabled the Kernel option for IP forwarding with t
     sudo ip route add 192.168.4.0/23 via 10.1.1.2
 
 ## Router-2
-As for Router-1, in our Router-2 we have done the same exact procedures showed above. Moreover, we have added the addresses to the designated devices. With the command `sudo ip route add` we have added the two routes via the designated gateway to the correct address.
-  
+As for Router-1, in our Router-2 we did the same exact procedures showed above. Moreover, we added the addresses to the designated devices. With the command `sudo ip route add` we added the two routes via the designated gateway to the correct address.
+
     export DEBIAN_FRONTEND=noninteractive
     sudo sysctl -w net.ipv4.ip_forward=1
     sudo ip addr add 10.1.1.2/30 dev enp0s9
@@ -208,8 +214,9 @@ As for Router-1, in our Router-2 we have done the same exact procedures showed a
     sudo ip route add 192.168.0.0/21 via 10.1.1.1
 
 ### Host-A
-For Host-A, we have configured the interface with its IP address, started the network interface by adding the command `sudo ip link set dev enp0s8 up`, then we connected, with the command `sudo ip route add` the new route's subnet to the designated device
-  
+For Host-A, we configured the interface with its IP address, started the network interface by adding the command `sudo ip link set dev enp0s8 up`, then we connected, with the command `sudo ip route add` the new route's subnet to the designated device. This means that in order to reach the netowrk 10.1.1.0/30 it is necessary to contact the gateway with ip 192.168.0.1 using the interface enp0s8.
+In the same way the fourth line allow host-a to connect to host-c.
+    
     export DEBIAN_FRONTEND=noninteractive
     sudo ip addr add 192.168.0.2/23 dev enp0s8
     sudo ip link set dev enp0s8 up
@@ -217,8 +224,8 @@ For Host-A, we have configured the interface with its IP address, started the ne
     sudo ip route add 192.168.0.0/21 via 192.168.0.1
 
 ### Host-B
-As for Host-A, in Host-B we have configured the interface with its IP address, started the network interface by adding the command `sudo ip link set dev enp0s8 up`, then we connected, with the command `sudo ip route add` the new route's subnet to the designated device
-    
+As for Host-A, in Host-B we configured the interface with its IP address, started the network interface by adding the command `sudo ip link set dev enp0s8 up`, then we connected, with the command `sudo ip route add` the new route's subnet to the designated device.
+
     export DEBIAN_FRONTEND=noninteractive
     sudo ip addr add 192.168.2.2/23 dev enp0s8
     sudo ip link set dev enp0s8 up
@@ -226,8 +233,8 @@ As for Host-A, in Host-B we have configured the interface with its IP address, s
     sudo ip route add 192.168.0.0/21 via 192.168.2.1
 
 ### Host-C
-Instead, for Host-C, with the command `sudo apt-get update` we have downloaded the package information from all the configured sources.
-Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`. 
+Instead, for Host-C, with the command `sudo apt-get update` we downloaded the package information from all the configured sources.
+Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`. The command sudo docker run --name nginx -p 80:80 -d dustnic82/nginx-test runs the docker image as daemon connecting port 80 to the port 80 of host-c.
     
     export DEBIAN_FRONTEND=noninteractive
     sudo apt-get update
@@ -243,7 +250,7 @@ Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`.
 
 ## Test results
 To see if the results of our work were correct, we had to test it. 
-We've started by using the command `vagrant up` and the we've logged into Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We have done it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending on which host we've chosen to use. In the end, we've used the command `curl 192.168.4.2` to make the request. As a result, we have obtained the following output :
+We started by using the command `vagrant up` and the we logged into Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We did it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending on which host we've chosen to use. In the end, we used the command `curl 192.168.4.2` to make the request. As a result, we obtained the following output :
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Final_results.jpg)
   
     
