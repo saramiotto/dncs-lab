@@ -178,7 +178,8 @@ So here it is a brief summery of the commands used. In the following paragraphs 
 Then we started to configure each device that was previously mentioned.
 
 ### Switch
-Speaking of our switch, we had already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. Then we added, with the command `add-br`, a bridge and configured the different ports that we would have needed. In the end, we used the command `sudo ip link set dev` to start the network interfaces.   
+Speaking of our Switch, we had already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. Then we added, with the command `add-br`, a bridge and configured the different ports that we would have needed. In the end, we used the command `sudo ip link set dev` to start the network interfaces. 
+  
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y tcpdump
