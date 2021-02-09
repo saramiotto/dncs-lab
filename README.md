@@ -115,26 +115,26 @@ The assignment deliverable consists of a Github repository containing:
 - https://www.cyberciti.biz/faq/howto-linux-configuring-default-route-with-ipcommand/
 - https://www.vagrantup.com/intro/getting-started/
 
-
-
 # Design
 The three values that we have found by running the dncs-init script are:
 - 376 for Host-A;
 - 479 for Host-B;
 - 470 for Host-C.
-These represent the numbers of the scalable hosts in the subnets. 
+These represent the numbers of the scalable hosts in the subnets.
 In order to design the network as it was requested, we had to follow some other rules:
-- Host-C had to run a docker image (dustnic82/nginx-test) which implements a web server that had to be reachable from Host-A and Host_B;
+- Host-C has to run a docker image (dustnic82/nginx-test) which implements a web server that has to be reachable from Host-A and Host-B;
 - No dynamic routing could have been used;
-- Routes had to be has generic as possible.
+- Routes have to be has generic as possible.
+
 ## Subnetting
 We have chosen to split up our network into four subnets: 
-- for the first one, which is between Router-1 and Router-2, we have decided to use the subnet 10.1.1.0/30 so that we were able to cover only the two routers that we had taken into account ((2^2)-2=2);
-- for the second one, which is between Router-1 and Host-A, we have figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, ((2^9)-2)=510>376). Infatc with 9 bits we obtain 2^9 - 2 = 510 usable addresses (one of them for the gateway).
-- for the third one, which is between Router-1 and Host-B, we have used the subnet 192.168.2.0/23. In this way, we have covered the 479 addresses ((2^9)-2)=510>479).
-- for the last one, which is between Router-2 and Host-C, we have used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses ((2^9)-2)=510>493).
+- for the first one, which is between Router-1 and Router-2, we decided to use the subnet 10.1.1.0/30 so that we were able to cover only the two routers that we had taken into account ((2^2)-2=2);
+- for the second one, which is between Router-1 and Host-A, we figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, ((2^9)-2)=510>376). In fatc with 9 bits we obtain 2^9 - 2 = 510 usable addresses (one of them for the gateway).
+- for the third one, which is between Router-1 and Host-B, we used the subnet 192.168.2.0/23. In this way, we had covered the 479 addresses ((2^9)-2)=510>479).
+- for the last one, which is between Router-2 and Host-C, we used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses ((2^9)-2)=510>493).
+
 ## Ip configuration and VLAN
-Then, we have proceeded to create two VLANs: one meant for subnet-2,and with Tag "2". The other one for subnet-3 and with Tag "3". The choice of creating two VLANs was made in order to distinguish the network belonging to Host-A and the network of Host-B.
+Then, we proceeded to create two VLANs: one meant for subnet-2,and with Tag "2", the other one for subnet-3 and with Tag "3". The choice of creating two VLANs was made in order to distinguish the network belonging to Host-A and the network of Host-B.
 | Device name       | Ip Address        | Network Interface   |  Subnet      |
 | -------------     | -------------     | -------------       |------------- |
 | Router-1          | 10.1.1.1          | enp0s9              |   1          |         
@@ -145,14 +145,15 @@ Then, we have proceeded to create two VLANs: one meant for subnet-2,and with Tag
 | Host-B            | 192.168.2.2       | enp0s8              |   3          |
 | Router-2          | 192.168.4.1       | enp0s8              |   4          |
 | Host-C            | 192.168.4.2       | enp0s8              |   4          |
+
 ## Network Schema 
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Network_Schema.jpeg)
+
 ## Vagrant file
-The commands that we have used to configure the network  are included in the shell script, one for each device implemented. They start running when the Virtual Machines are created by launching the "vagrant up" command.
-They are all included in the so-called "Vagrantfile".
-The reason why we have decided to use this range of addresses was to accomplish the requirement that stated that we had to create routes as much generic as possible.
-We have also modified the Vagrantfile, in order to insert the specific path for every device that we had.
-To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB modifying he option vb.memory. That choice was taken because that specific host runs the Docker image (dustnic82/nginx-test). With 256 MB of memory we wouldn't have been able to pull and run the Docker image itself.
+The commands that we have used to configure the network  are included in the shell script, one for each device implemented. They start running when the Virtual Machines are created by launching the "vagrant up" command. They are all written in the so-called "Vagrantfile".
+Speaking of addresses, the reason why we have decided to use this particular range of addresses was to accomplish the requirement that stated that we had to create routes as much generic as possible.
+We have also modified the Vagrantfile in order to insert the specific path for every device that we had.
+To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB modifying the option [vb.memory]. That choice was taken because that specific host runs the Docker image (dustnic82/nginx-test). With 256 MB of memory we wouldn't have been able to pull and run the Docker image itself.
 
     config.vm.define "host-c" do |hostc|
     hostc.vm.box = "ubuntu/bionic64"
@@ -164,17 +165,19 @@ To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB modifying h
     end  
 
 ## Commands used
-Before starting configuring our network we needed to check the correspondency between the interfaces names and the specifications given in the assignment so we used the command dsmeg | grep -i eth to do that. All the other commands are preceded by the keyword 'sudo' to make them execute by the superuser.
+Before starting configuring our network we needed to check the correspondency between the interfaces names and the specifications given in the assignment so we used the command [dsmeg|grep-i_eth] to do that. All the other commands are preceded by the keyword 'sudo' to make them execute by the superuser.
 So here it is a brief summery of the commands used. In the following paragraphs we will go deeply into them:
 * ip addr add [ip_address] dev [interface]: assignes an IP address to each interface;
 * ip link set dev [interface] up: activates the interface;
 * ip link add link [original_interface] name [VLAN] type vlan id [tag]: creates a VLAN named [VLAN] from the interface [original_interface] and that add the tag [tag] to the traffic passing through that VLAN;
 * sysctl -w net.ipv4.ip_forward=1: enables the IPv4 forwarding in the two routers;
 * ip route add [addresses_covered] via [address] dev [interface]: creates a route that takes all the traffic to the addresses included in the network [addresses_covered] and direct it to the [address] passing from the [interface];
+
 ## Devices Configuration
 Then we started to configure each device that was previously mentioned.
+
 ### Switch
-Speaking of our Switch, we had already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. Then we added, with the command `add-br`, a bridge and configured the different ports that we would have needed. In the end, we used the command `sudo ip link set dev` to start the network interfaces.   
+Speaking of our switch, we had already found the first four lines in the `switch.sh` provided template. These lines allows us to install some useful Vlans configuration's tools. Then we added, with the command `add-br`, a bridge and configured the different ports that we would have needed. In the end, we used the command `sudo ip link set dev` to start the network interfaces.   
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y tcpdump
@@ -252,8 +255,6 @@ Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`. The com
 To see if the results of our work were correct, we had to test it. 
 We started by using the command `vagrant up` and the we logged into Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We did it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending on which host we've chosen to use. In the end, we used the command `curl 192.168.4.2` to make the request. As a result, we obtained the following output :
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Final_results.jpg)
-  
-    
 
 ## Team members
 This project has been realised by Miotto Sara (matriculation number: 202440) and Calore Chiara (matriculation number: 202404)
