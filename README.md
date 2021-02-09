@@ -128,10 +128,10 @@ In order to design the network as it was requested, we had to follow some other 
 
 ## Subnetting
 We have chosen to split up our network into four subnets: 
-- for the first one, which is between Router-1 and Router-2, we decided to use the subnet 10.1.1.0/30 so that we were able to cover only the two routers that we had taken into account ((2^2)-2=2);
-- for the second one, which is between Router-1 and Host-A, we figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, ((2^9)-2)=510>376). In fatc with 9 bits we obtain 2<sup>9</sup> - 2 = 510 usable addresses (one of them for the gateway).
-- for the third one, which is between Router-1 and Host-B, we used the subnet 192.168.2.0/23. In this way, we had covered the 479 addresses ((2^9)-2)=510>479).
-- for the last one, which is between Router-2 and Host-C, we used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses ((2^9)-2)=510>493).
+- for the first one, which is between Router-1 and Router-2, we have decided to use the subnet 10.1.1.0/30 so that we were able to cover only the two routers that we had taken into account ((2<sup>2</sup>)-2=2);
+- for the second one, which is between Router-1 and Host-A, we have figured out that we had to use the subnet 192.168.0.0/23 in order to cover the number of the provided hosts, ((2<sup>9</sup>)-2)=510>376). Infatc with 9 bits we obtain 2<sup>9</sup> - 2 = 510 usable addresses (one of them for the gateway).
+- for the third one, which is between Router-1 and Host-B, we have used the subnet 192.168.2.0/23. In this way, we have covered the 479 addresses (2<sup>9</sup>-2)=510>479).
+- for the last one, which is between Router-2 and Host-C, we have used the subnet 192.168.4.0/23 and so we had succeeded to cover the 493 addresses (2<sup>9</sup>-2)=510>493).
 
 ## Ip configuration and VLAN
 Then, we proceeded to create two VLANs: one meant for subnet-2,and with Tag "2", the other one for subnet-3 and with Tag "3". The choice of creating two VLANs was made in order to distinguish the network belonging to Host-A and the network of Host-B.
