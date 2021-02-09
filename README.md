@@ -165,7 +165,7 @@ To conclude, we have enlarged Host-C's memory, from 256 MB to 512 MB modifying t
     end  
 
 ## Commands used
-Before starting configuring our network we needed to check the correspondency between the interfaces names and the specifications given in the assignment so we used the command [dsmeg|grep-i_eth] to do that. All the other commands are preceded by the keyword 'sudo' to make them execute by the superuser.
+Before starting configuring our network we needed to check the correspondency between the interfaces names and the specifications given in the assignment so we used the command `dsmeg| grep -i eth` to do that. All the other commands are preceded by the keyword 'sudo' to make them execute by the superuser.
 So here it is a brief summery of the commands used. In the following paragraphs we will go deeply into them:
 * ip addr add [ip_address] dev [interface]: assignes an IP address to each interface;
 * ip link set dev [interface] up: activates the interface;
