@@ -256,7 +256,8 @@ Then we installed the `docker.io` and pulled the `dustnic82/nginx-test`. The com
 ## Test results
 To see if the results of our work were correct, we had to test it. 
 We started by using the command `vagrant up` and the we logged into Host-A or Host-B in order to verify Host-C's reachability from the other two hosts. We did it by using the command `vagrant ssh host-a` or `vagrant ssh host-b`, depending on which host we've chosen to use. In the end, we used the command `curl 192.168.4.2` to make the request. As a result, we obtained the following output:
-`<!DOCTYPE html>
+ ``` 
+<!DOCTYPE html>
 <html>
 <head>
 <title>Hello World</title>
@@ -356,7 +357,8 @@ function changeCookie() {
         </div>
     </div>
 </body>
-</html>`
+</html>
+```
 
 ![alt text here](https://github.com/calorechiara/dncs-lab/blob/master/network_img/Final_results.jpg)
 
